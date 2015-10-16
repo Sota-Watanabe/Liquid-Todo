@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="main.css">
     <script type="application/javascript" src="dist/bundle.js"></script>
-    <script type="application/javascript">
-        var todo = require('todo')
-    </script>
+
     <title>Todo</title>
 </head>
 <body>
@@ -41,9 +40,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Add new todo item..">
+                    <input id ="todo-text" type="text" class="form-control" placeholder="Add new todo item..">
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" onclick="todo.addTodo()">Add</button>
+                        <button class="btn btn-default" type="button" onclick="todo.addTodo(document.getElementById('todo-text').value)">Add</button>
                     </span>
                 </div>
             </div>
@@ -51,17 +50,21 @@
         </div>
         <hr>
 
-        <ul id="todo-list">
-            <li>
-                <div>
-                    foo faas
-                </div>
+        <ul class="list-group todo-list">
+            <li class="list-group-item">
+                <input type="checkbox" class="toggle">
+
+                    <label>foo faassdfkjdsnf dsknf dslknfd slknf dslkfn dslkfndslkfndsl</label>
+                <button class="destroy"></button>
             </li>
         </ul>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="application/javascript">
+        var todo = require('todo')
+    </script>
 </body>
 </html>

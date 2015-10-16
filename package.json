@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/Zharktas/Liquid-Todo/issues"
   },
-  "homepage": "https://github.com/Zharktas/Liquid-Todo#readme"
+  "homepage": "https://github.com/Zharktas/Liquid-Todo#readme",
+  "devDependencies": {
+    "browserify": "^11.2.0"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.5",
+    "express": "^4.13.3",
+    "liquid.js": "git+ssh://git@github.com/Zharktas/liquid.js.git",
+    "socket.io": "^1.3.7"
+  }
 }
