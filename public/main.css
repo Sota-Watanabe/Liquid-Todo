@@ -28,6 +28,10 @@
     margin-left: 45px;
 }
 
+.todo-list li label.done{
+    text-decoration: line-through;
+}
+
 .todo-list li .destroy {
     display: none;
     position: absolute;
