@@ -1233,7 +1233,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./transport":13,"./transports":14,"component-emitter":8,"debug":20,"engine.io-parser":24,"indexof":30,"parsejson":38,"parseqs":39,"parseuri":23}],13:[function(require,module,exports){
+},{"./transport":13,"./transports":14,"component-emitter":8,"debug":20,"engine.io-parser":24,"indexof":30,"parsejson":39,"parseqs":40,"parseuri":23}],13:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -2323,7 +2323,7 @@ Polling.prototype.uri = function(){
   return schema + '://' + this.hostname + port + this.path + query;
 };
 
-},{"../transport":13,"component-inherit":9,"debug":20,"engine.io-parser":24,"parseqs":39,"xmlhttprequest":19}],18:[function(require,module,exports){
+},{"../transport":13,"component-inherit":9,"debug":20,"engine.io-parser":24,"parseqs":40,"xmlhttprequest":19}],18:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -2563,7 +2563,7 @@ WS.prototype.check = function(){
   return !!WebSocket && !('__initialize' in WebSocket && this.name === WS.prototype.name);
 };
 
-},{"../transport":13,"component-inherit":9,"debug":20,"engine.io-parser":24,"parseqs":39,"ws":77}],19:[function(require,module,exports){
+},{"../transport":13,"component-inherit":9,"debug":20,"engine.io-parser":24,"parseqs":40,"ws":78}],19:[function(require,module,exports){
 // browser shim for xmlhttprequest module
 var hasCORS = require('has-cors');
 
@@ -3701,7 +3701,7 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./keys":25,"after":1,"arraybuffer.slice":2,"base64-arraybuffer":4,"blob":5,"has-binary":27,"utf8":53}],25:[function(require,module,exports){
+},{"./keys":25,"after":1,"arraybuffer.slice":2,"base64-arraybuffer":4,"blob":5,"has-binary":27,"utf8":54}],25:[function(require,module,exports){
 
 /**
  * Gets the keys for an object.
@@ -4726,66 +4726,121 @@ module.exports = Array.isArray || function (arr) {
 
 },{}],34:[function(require,module,exports){
 var VDom = require('./lib/VDom.js');
+var UI = require('./lib/UI.js');
 
 var vdom;
 var opts;
+var ui;
 
 var Liquid = function(options){
     this.options = opts =  options || {};
-    this.options.vdom = this.options.vdom || {};
-    this.vdom = vdom = new VDom(this.options.vdom);
+    this.options.ui = this.options.ui || {};
 
-    this.options.createUI = this.options.createUI || true;
-    if ( this.options.createUI == true ){
-        CreateUIElements();
-    }
+    this.options.vdom = this.options.vdom || {};
+    this.vdom = vdom = new VDom(this.options.vdom, this.options.ui);
+
+    this.ui = ui = new UI(this.options.ui, vdom);
+
+    vdom.setUi(ui);
+
+    ui.CreateUIElements();
+
+
+
 
     if (vdom.options.transferMethod == 'socket.io'){
         vdom.client.on('list', function(data){
-            if ( opts.createUI == true ){
-                addClientsToUI(data)
-            }
+            ui.addClientsToUI(data)
         });
     }
 
 };
 
 
-var CreateUIElements = function(){
 
-    var container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.bottom = 0;
-    container.style.left = 0;
-    container.style.zIndex  = 10000;
 
-    var syncButton = document.createElement('button');
-    syncButton.onclick = sync;
-    syncButton.textContent = 'Sync to All';
+module.exports = Liquid;
 
-    var clientList = document.createElement('select');
-    clientList.id = 'client-list';
-    clientList.onfocus = getList;
+},{"./lib/UI.js":35,"./lib/VDom.js":36}],35:[function(require,module,exports){
 
-    var defaultOption = document.createElement('option');
-    defaultOption.textContent = "Click to fetch clients";
-    defaultOption.disabled = 'disabled';
-    clientList.appendChild(defaultOption);
+var opts;
+var vdom;
 
-    var syncToClientButton = document.createElement('button');
-    syncToClientButton.onclick = syncToClient;
-    syncToClientButton.textContent = "Sync to Client";
-
-    container.appendChild(syncButton);
-    container.appendChild(clientList);
-    container.appendChild(syncToClientButton);
-    document.body.appendChild(container);
+var UI = function(options, vdomObj){
+    this.options = opts = options || {};
+    vdom = vdomObj;
 };
+
+UI.prototype.CreateUIElements = CreateUIElements = function(){
+
+    if ( opts.createUI == true ) {
+
+        var container = document.createElement('div');
+        container.id = 'Liquid-ui';
+        container.style.position = 'absolute';
+        container.style.bottom = 0;
+        container.style.left = 0;
+        container.style.zIndex = 10000;
+
+        var syncButton = document.createElement('button');
+        syncButton.onclick = sync;
+        syncButton.textContent = 'Sync to All';
+
+        var clientList = document.createElement('select');
+        clientList.id = 'client-list';
+        clientList.onfocus = getList;
+
+        var defaultOption = document.createElement('option');
+        defaultOption.textContent = "Click to fetch clients";
+        defaultOption.disabled = 'disabled';
+        clientList.appendChild(defaultOption);
+
+        var syncToClientButton = document.createElement('button');
+        syncToClientButton.onclick = syncToClient;
+        syncToClientButton.textContent = "Sync to Client";
+
+        container.appendChild(syncButton);
+        container.appendChild(clientList);
+        container.appendChild(syncToClientButton);
+        document.body.appendChild(container);
+    }
+};
+
+UI.prototype.RemoveUIElements = RemoveUIElements =  function(){
+    if ( opts.createUI == true ) {
+        document.body.removeChild(document.getElementById('Liquid-ui'));
+    }
+};
+
+
+UI.prototype.addClientsToUI = addClientsToUI =  function(list){
+    if ( opts.createUI == true){
+        var select = document.querySelector('#client-list');
+
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
+        }
+
+        list.forEach(function(id){
+            var option = document.createElement('option');
+            option.value = id;
+            option.textContent = id;
+            select.appendChild(option);
+        })
+    }
+};
+
 
 var sync = function(){
+
+    RemoveUIElements();
+
     vdom.virtualize();
     vdom.transfer();
+
+    CreateUIElements();
 };
+
 
 var getList = function(){
     if (vdom.options.transferMethod == 'socket.io'){
@@ -4793,33 +4848,25 @@ var getList = function(){
     }
 };
 
-var addClientsToUI = function(list){
-    var select = document.querySelector('#client-list');
 
-    while (select.firstChild) {
-        select.removeChild(select.firstChild);
-    }
-
-    list.forEach(function(id){
-        var option = document.createElement('option');
-        option.value = id;
-        option.textContent = id;
-        option.onclick = function(){}
-        select.appendChild(option);
-    })
-};
 
 var syncToClient = function(){
     var select = document.querySelector('#client-list');
     if ( select.value != "" ){
+        RemoveUIElements();
         vdom.virtualize();
         vdom.transferToClient(select.value);
+        CreateUIElements();
     }
 };
 
-module.exports = Liquid;
 
-},{"./lib/VDom.js":35}],35:[function(require,module,exports){
+
+
+
+
+module.exports = UI;
+},{}],36:[function(require,module,exports){
 var virtualize = require('vdom-virtualize');
 var patch = require('virtual-dom/patch');
 var diff = require('virtual-dom/diff');
@@ -4828,8 +4875,9 @@ var Serializer = require('vdom-serialize');
 var virtualizedState = null;
 var initialState = null;
 
+var uiInstance;
 
-var VDom = function(options){
+var VDom = function(options, uiOptions){
     this.options = options || {};
     if (!this.options.transferMethod) {
         this.options.transferMethod = 'socket.io';
@@ -4843,18 +4891,23 @@ var VDom = function(options){
 
         this.client.on("sync", function(data){
             var serialized = Serializer.deserialize(data);
-
             var toInitial = diff(document.body, initialState);
             patch(document.body, toInitial);
 
             patch(document.body, serialized);
+
+            if (uiOptions.createUI == true && uiInstance){
+                uiInstance.CreateUIElements();
+            }
         })
     }
 
     initialState = virtualize(document.body);
 };
 
-
+VDom.prototype.setUi = function(ui){
+    uiInstance = ui;
+};
 
 
 VDom.prototype.virtualize = function(){
@@ -4900,7 +4953,7 @@ VDom.prototype.transferToClient = function(client_id){
 
 
 module.exports = VDom;
-},{"socket.io-client":41,"vdom-serialize":54,"vdom-virtualize":55,"virtual-dom/diff":57,"virtual-dom/patch":58}],36:[function(require,module,exports){
+},{"socket.io-client":42,"vdom-serialize":55,"vdom-virtualize":56,"virtual-dom/diff":58,"virtual-dom/patch":59}],37:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -17255,7 +17308,7 @@ module.exports = VDom;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
 /**
  * HOP ref.
@@ -17340,7 +17393,7 @@ exports.length = function(obj){
 exports.isEmpty = function(obj){
   return 0 == exports.length(obj);
 };
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (global){
 /**
  * JSON parse.
@@ -17375,7 +17428,7 @@ module.exports = function parsejson(data) {
   }
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  * Compiles a querystring
  * Returns string representation of the object
@@ -17414,7 +17467,7 @@ exports.decode = function(qs){
   return qry;
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -17441,11 +17494,11 @@ module.exports = function parseuri(str) {
   return uri;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 
 module.exports = require('./lib/');
 
-},{"./lib/":42}],42:[function(require,module,exports){
+},{"./lib/":43}],43:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -17534,7 +17587,7 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./manager":43,"./socket":45,"./url":46,"debug":47,"socket.io-parser":49}],43:[function(require,module,exports){
+},{"./manager":44,"./socket":46,"./url":47,"debug":48,"socket.io-parser":50}],44:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -18039,7 +18092,7 @@ Manager.prototype.onreconnect = function(){
   this.emitAll('reconnect', attempt);
 };
 
-},{"./on":44,"./socket":45,"./url":46,"backo2":3,"component-bind":7,"component-emitter":8,"debug":47,"engine.io-client":10,"indexof":30,"object-component":37,"socket.io-parser":49}],44:[function(require,module,exports){
+},{"./on":45,"./socket":46,"./url":47,"backo2":3,"component-bind":7,"component-emitter":8,"debug":48,"engine.io-client":10,"indexof":30,"object-component":38,"socket.io-parser":50}],45:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -18065,7 +18118,7 @@ function on(obj, ev, fn) {
   };
 }
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -18452,7 +18505,7 @@ Socket.prototype.disconnect = function(){
   return this;
 };
 
-},{"./on":44,"component-bind":7,"component-emitter":8,"debug":47,"has-binary":27,"socket.io-parser":49,"to-array":52}],46:[function(require,module,exports){
+},{"./on":45,"component-bind":7,"component-emitter":8,"debug":48,"has-binary":27,"socket.io-parser":50,"to-array":53}],47:[function(require,module,exports){
 (function (global){
 
 /**
@@ -18529,7 +18582,7 @@ function url(uri, loc){
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"debug":47,"parseuri":40}],47:[function(require,module,exports){
+},{"debug":48,"parseuri":41}],48:[function(require,module,exports){
 
 /**
  * Expose `debug()` as the module.
@@ -18668,7 +18721,7 @@ try {
   if (window.localStorage) debug.enable(localStorage.debug);
 } catch(e){}
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
 /*global Blob,File*/
 
@@ -18813,7 +18866,7 @@ exports.removeBlobs = function(data, callback) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./is-buffer":50,"isarray":32}],49:[function(require,module,exports){
+},{"./is-buffer":51,"isarray":32}],50:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -19215,7 +19268,7 @@ function error(data){
   };
 }
 
-},{"./binary":48,"./is-buffer":50,"component-emitter":8,"debug":51,"isarray":32,"json3":33}],50:[function(require,module,exports){
+},{"./binary":49,"./is-buffer":51,"component-emitter":8,"debug":52,"isarray":32,"json3":33}],51:[function(require,module,exports){
 (function (global){
 
 module.exports = isBuf;
@@ -19232,9 +19285,9 @@ function isBuf(obj) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],51:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"dup":47}],52:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
+arguments[4][48][0].apply(exports,arguments)
+},{"dup":48}],53:[function(require,module,exports){
 module.exports = toArray
 
 function toArray(list, index) {
@@ -19249,7 +19302,7 @@ function toArray(list, index) {
     return array
 }
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/utf8js v2.0.0 by @mathias */
 ;(function(root) {
@@ -19497,7 +19550,7 @@ function toArray(list, index) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 var VNode = require('virtual-dom/vnode/vnode');
 var VPatch = require('virtual-dom/vnode/vpatch');
 var VText = require('virtual-dom/vnode/vtext');
@@ -19569,7 +19622,7 @@ function iterate(obj){
 
     return obj;
 }
-},{"lodash":36,"virtual-dom/vnode/vnode":72,"virtual-dom/vnode/vpatch":73,"virtual-dom/vnode/vtext":74}],55:[function(require,module,exports){
+},{"lodash":37,"virtual-dom/vnode/vnode":73,"virtual-dom/vnode/vpatch":74,"virtual-dom/vnode/vtext":75}],56:[function(require,module,exports){
 /*!
 * vdom-virtualize
 * Copyright 2014 by Marcel Klehr <mklehr@gmx.net>
@@ -19885,7 +19938,7 @@ module.exports.attrs = [
 ,"y"
 ]
 
-},{"./vcomment":56,"virtual-dom/vnode/vnode":72,"virtual-dom/vnode/vtext":74}],56:[function(require,module,exports){
+},{"./vcomment":57,"virtual-dom/vnode/vnode":73,"virtual-dom/vnode/vtext":75}],57:[function(require,module,exports){
 module.exports = VirtualComment
 
 function VirtualComment(text) {
@@ -19903,17 +19956,17 @@ VirtualComment.prototype.update = function(previous, domNode) {
   domNode.nodeValue = this.text
 }
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 var diff = require("./vtree/diff.js")
 
 module.exports = diff
 
-},{"./vtree/diff.js":76}],58:[function(require,module,exports){
+},{"./vtree/diff.js":77}],59:[function(require,module,exports){
 var patch = require("./vdom/patch.js")
 
 module.exports = patch
 
-},{"./vdom/patch.js":63}],59:[function(require,module,exports){
+},{"./vdom/patch.js":64}],60:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook.js")
 
@@ -20012,7 +20065,7 @@ function getPrototype(value) {
     }
 }
 
-},{"../vnode/is-vhook.js":67,"is-object":31}],60:[function(require,module,exports){
+},{"../vnode/is-vhook.js":68,"is-object":31}],61:[function(require,module,exports){
 var document = require("global/document")
 
 var applyProperties = require("./apply-properties")
@@ -20060,7 +20113,7 @@ function createElement(vnode, opts) {
     return node
 }
 
-},{"../vnode/handle-thunk.js":65,"../vnode/is-vnode.js":68,"../vnode/is-vtext.js":69,"../vnode/is-widget.js":70,"./apply-properties":59,"global/document":26}],61:[function(require,module,exports){
+},{"../vnode/handle-thunk.js":66,"../vnode/is-vnode.js":69,"../vnode/is-vtext.js":70,"../vnode/is-widget.js":71,"./apply-properties":60,"global/document":26}],62:[function(require,module,exports){
 // Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
 // We don't want to read all of the DOM nodes in the tree so we use
 // the in-order tree indexing to eliminate recursion down certain branches.
@@ -20147,7 +20200,7 @@ function ascending(a, b) {
     return a > b ? 1 : -1
 }
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 var applyProperties = require("./apply-properties")
 
 var isWidget = require("../vnode/is-widget.js")
@@ -20300,7 +20353,7 @@ function replaceRoot(oldRoot, newRoot) {
     return newRoot;
 }
 
-},{"../vnode/is-widget.js":70,"../vnode/vpatch.js":73,"./apply-properties":59,"./update-widget":64}],63:[function(require,module,exports){
+},{"../vnode/is-widget.js":71,"../vnode/vpatch.js":74,"./apply-properties":60,"./update-widget":65}],64:[function(require,module,exports){
 var document = require("global/document")
 var isArray = require("x-is-array")
 
@@ -20382,7 +20435,7 @@ function patchIndices(patches) {
     return indices
 }
 
-},{"./create-element":60,"./dom-index":61,"./patch-op":62,"global/document":26,"x-is-array":78}],64:[function(require,module,exports){
+},{"./create-element":61,"./dom-index":62,"./patch-op":63,"global/document":26,"x-is-array":79}],65:[function(require,module,exports){
 var isWidget = require("../vnode/is-widget.js")
 
 module.exports = updateWidget
@@ -20399,7 +20452,7 @@ function updateWidget(a, b) {
     return false
 }
 
-},{"../vnode/is-widget.js":70}],65:[function(require,module,exports){
+},{"../vnode/is-widget.js":71}],66:[function(require,module,exports){
 var isVNode = require("./is-vnode")
 var isVText = require("./is-vtext")
 var isWidget = require("./is-widget")
@@ -20441,14 +20494,14 @@ function renderThunk(thunk, previous) {
     return renderedThunk
 }
 
-},{"./is-thunk":66,"./is-vnode":68,"./is-vtext":69,"./is-widget":70}],66:[function(require,module,exports){
+},{"./is-thunk":67,"./is-vnode":69,"./is-vtext":70,"./is-widget":71}],67:[function(require,module,exports){
 module.exports = isThunk
 
 function isThunk(t) {
     return t && t.type === "Thunk"
 }
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports = isHook
 
 function isHook(hook) {
@@ -20457,7 +20510,7 @@ function isHook(hook) {
        typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
 }
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualNode
@@ -20466,7 +20519,7 @@ function isVirtualNode(x) {
     return x && x.type === "VirtualNode" && x.version === version
 }
 
-},{"./version":71}],69:[function(require,module,exports){
+},{"./version":72}],70:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualText
@@ -20475,17 +20528,17 @@ function isVirtualText(x) {
     return x && x.type === "VirtualText" && x.version === version
 }
 
-},{"./version":71}],70:[function(require,module,exports){
+},{"./version":72}],71:[function(require,module,exports){
 module.exports = isWidget
 
 function isWidget(w) {
     return w && w.type === "Widget"
 }
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 module.exports = "2"
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 var version = require("./version")
 var isVNode = require("./is-vnode")
 var isWidget = require("./is-widget")
@@ -20559,7 +20612,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
 VirtualNode.prototype.version = version
 VirtualNode.prototype.type = "VirtualNode"
 
-},{"./is-thunk":66,"./is-vhook":67,"./is-vnode":68,"./is-widget":70,"./version":71}],73:[function(require,module,exports){
+},{"./is-thunk":67,"./is-vhook":68,"./is-vnode":69,"./is-widget":71,"./version":72}],74:[function(require,module,exports){
 var version = require("./version")
 
 VirtualPatch.NONE = 0
@@ -20583,7 +20636,7 @@ function VirtualPatch(type, vNode, patch) {
 VirtualPatch.prototype.version = version
 VirtualPatch.prototype.type = "VirtualPatch"
 
-},{"./version":71}],74:[function(require,module,exports){
+},{"./version":72}],75:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = VirtualText
@@ -20595,7 +20648,7 @@ function VirtualText(text) {
 VirtualText.prototype.version = version
 VirtualText.prototype.type = "VirtualText"
 
-},{"./version":71}],75:[function(require,module,exports){
+},{"./version":72}],76:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook")
 
@@ -20655,7 +20708,7 @@ function getPrototype(value) {
   }
 }
 
-},{"../vnode/is-vhook":67,"is-object":31}],76:[function(require,module,exports){
+},{"../vnode/is-vhook":68,"is-object":31}],77:[function(require,module,exports){
 var isArray = require("x-is-array")
 
 var VPatch = require("../vnode/vpatch")
@@ -21084,7 +21137,7 @@ function appendPatch(apply, patch) {
     }
 }
 
-},{"../vnode/handle-thunk":65,"../vnode/is-thunk":66,"../vnode/is-vnode":68,"../vnode/is-vtext":69,"../vnode/is-widget":70,"../vnode/vpatch":73,"./diff-props":75,"x-is-array":78}],77:[function(require,module,exports){
+},{"../vnode/handle-thunk":66,"../vnode/is-thunk":67,"../vnode/is-vnode":69,"../vnode/is-vtext":70,"../vnode/is-widget":71,"../vnode/vpatch":74,"./diff-props":76,"x-is-array":79}],78:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -21129,7 +21182,7 @@ function ws(uri, protocols, opts) {
 
 if (WebSocket) ws.prototype = WebSocket.prototype;
 
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 var nativeIsArray = Array.isArray
 var toString = Object.prototype.toString
 
@@ -21146,6 +21199,9 @@ var liquid = new Liquid({
     vdom: {
         transferMethod: 'socket.io',
         path: ''
+    },
+    ui: {
+        createUI: true
     }
 });
 

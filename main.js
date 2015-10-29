@@ -4,6 +4,9 @@ var liquid = new Liquid({
     vdom: {
         transferMethod: 'socket.io',
         path: ''
+    },
+    ui: {
+        createUI: true
     }
 });
 
