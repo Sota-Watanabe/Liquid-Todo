@@ -27,10 +27,23 @@ io.on('connection', function(socket){
     socket.on('sync', function(SyncObj){
         socket.broadcast.emit("sync", SyncObj);
         console.log("Broadcasted SyncObj:", SyncObj);
+    });
+
+    socket.on('getList', function(){
+        console.log("getting list for: ", socket.id);
+        var clientList = Object.keys(io.engine.clients);
+        var index = clientList.indexOf(socket.id);
+        clientList.splice(index, 1);
+        io.to(socket.id).emit("list", clientList);
+    });
+
+    socket.on('syncToClient', function(clientObj){
+        console.log("Syncin to: ", clientObj)
+        socket.to(clientObj.client).emit("sync", clientObj.sync);
     })
 });
 
 
-http.listen(80, function(){
-    console.log("Listening port 80");
+http.listen(8080, function(){
+    console.log("Listening port 8080");
 });

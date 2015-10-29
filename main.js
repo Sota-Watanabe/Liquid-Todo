@@ -1,6 +1,11 @@
 var Liquid = require('liquid.js');
 
-var liquid = new Liquid();
+var liquid = new Liquid({
+    vdom: {
+        transferMethod: 'socket.io',
+        path: ''
+    }
+});
 
 module.exports.addTodo = function(text){
 
