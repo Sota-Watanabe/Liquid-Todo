@@ -15,11 +15,14 @@ module.exports.addTodo = function(text){
     var checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.classList.add('toggle');
-    checkbox.onclick = toggleDone;
+    checkbox.addEventListener('click', toggleDone);
+    checkbox.setAttribute('data-handler', 'toggleClick');
+
+    liquid.registerHandler('toogleClick', toggleDone);
 
     var destroy = document.createElement('button');
     destroy.classList.add('destroy');
-    destroy.onclick = removeTodo;
+    destroy.addEventListener('click', removeTodo);
 
     var todo = document.createElement('label');
     todo.textContent = text;
