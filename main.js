@@ -1,14 +1,6 @@
 var Liquid = require('liquid.js');
 
-var liquid = new Liquid({
-    vdom: {
-        transferMethod: 'socket.io',
-        path: ''
-    },
-    ui: {
-        createUI: true
-    }
-});
+var liquid = new Liquid();
 
 module.exports.addTodo = function(text){
 
@@ -18,11 +10,13 @@ module.exports.addTodo = function(text){
     checkbox.addEventListener('click', toggleDone);
     checkbox.setAttribute('data-handler', 'toggleClick');
 
-    liquid.registerHandler('toogleClick', toggleDone);
+    liquid.registerHandler('toggleClick', {'click': toggleDone});
 
     var destroy = document.createElement('button');
     destroy.classList.add('destroy');
     destroy.addEventListener('click', removeTodo);
+    destroy.setAttribute('data-handler', 'destroyClick');
+    liquid.registerHandler('destroyClick', {'click': removeTodo});
 
     var todo = document.createElement('label');
     todo.textContent = text;
