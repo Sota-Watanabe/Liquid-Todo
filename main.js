@@ -1,4 +1,4 @@
-var Liquid = require('liquid.js');
+var Liquid = require('@zharktas/liquid.js');
 
 var liquid = new Liquid();
 
@@ -50,6 +50,6 @@ var removeTodo = function(event){
 module.exports.removeTodo = removeTodo;
 
 module.exports.transfer = function(){
-    liquid.vdom.virtualize()
+    liquid.vdom.virtualize();
     liquid.vdom.transfer();
 };

@@ -10,7 +10,7 @@ var io = require('socket.io')(http);
 app.use(express.static('public'));
 app.use(express.static('node_modules'));
 
-app.get('/', function(req, res, next){
+app.get('/todo', function(req, res, next){
     var options = {
         root: __dirname + '/public/',
         dotfiles: 'deny',
@@ -20,6 +20,30 @@ app.get('/', function(req, res, next){
         }
     };
     res.sendFile("index.html", options)
+});
+
+app.get('/vdom', function(req, res, next){
+    var options = {
+        root: __dirname + '/public/',
+        dotfiles: 'deny',
+        headers: {
+            'x-timestamp': Date.now(),
+            'x-sent': true
+        }
+    };
+    res.sendFile("vdom.html", options)
+});
+
+app.get('/functions', function(req, res, next){
+    var options = {
+        root: __dirname + '/public/',
+        dotfiles: 'deny',
+        headers: {
+            'x-timestamp': Date.now(),
+            'x-sent': true
+        }
+    };
+    res.sendFile("functions.html", options)
 });
 
 io.on('connection', function(socket){

@@ -22,7 +22,7 @@
   "dependencies": {
     "bootstrap": "^3.3.5",
     "express": "^4.13.3",
-    "liquid.js": "git+ssh://git@github.com/Zharktas/liquid.js.git",
-    "socket.io": "^1.3.7"
+    "@zharktas/liquid.js": "^1.0.0",
+    "socket.io": "1.3.7"
   }
 }
