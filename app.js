@@ -10,6 +10,8 @@ var io = require('socket.io')(http);
 app.use(express.static('public'));
 app.use(express.static('node_modules'));
 
+app.set('port', (process.env.PORT || 8080));
+
 app.get('/todo', function(req, res, next){
     var options = {
         root: __dirname + '/public/',
@@ -67,6 +69,6 @@ io.on('connection', function(socket){
 });
 
 
-http.listen(8080, function(){
-    console.log("Listening port 8080");
+http.listen(app.get("port"), function(){
+    console.log("Listening port " + app.get("port"));
 });
