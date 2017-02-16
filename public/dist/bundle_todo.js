@@ -9,14 +9,14 @@ module.exports.addTodo = function(text){
     checkbox.type = 'checkbox';
     checkbox.classList.add('toggle');
     checkbox.addEventListener('click', toggleDone);
-    //checkbox.setAttribute('data-handler', 'toggleClick');
+    checkbox.setAttribute('data-handler', 'toggleClick');
 
     //liquid.registerHandler('toggleClick', {'click': toggleDone});
 
     var destroy = document.createElement('button');
     destroy.classList.add('destroy');
     destroy.addEventListener('click', removeTodo);
-    //destroy.setAttribute('data-handler', 'destroyClick');
+    destroy.setAttribute('data-handler', 'destroyClick');
     //liquid.registerHandler('destroyClick', {'click': removeTodo});
 
     var todo = document.createElement('label');
@@ -51,7 +51,7 @@ var removeTodo = function(event){
 module.exports.removeTodo = removeTodo;
 
 module.exports.transfer = function(){
-    liquid.vdom.virtualize();
-    liquid.vdom.transfer();
+    //liquid.vdom.virtualize();
+    //liquid.vdom.transfer();
 };
-},{}]},{},["todo"]);
+},{}]},{},[]);

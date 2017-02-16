@@ -19,7 +19,7 @@ app.get('/todo', function(req, res, next){
             'x-sent': true
         }
     };
-    res.sendFile("index.html", options)
+    res.sendFile("todo.html", options)
 });
 
 app.get('/vdom', function(req, res, next){
@@ -34,7 +34,7 @@ app.get('/vdom', function(req, res, next){
     res.sendFile("vdom.html", options)
 });
 
-app.get('/functions', function(req, res, next){
+app.get('/', function(req, res, next){
     var options = {
         root: __dirname + '/public/',
         dotfiles: 'deny',
@@ -47,7 +47,6 @@ app.get('/functions', function(req, res, next){
 });
 
 io.on('connection', function(socket){
-    console.log("User is connected");
     socket.on('sync', function(SyncObj){
         socket.broadcast.emit("sync", SyncObj);
         console.log("Broadcasted SyncObj:", SyncObj);

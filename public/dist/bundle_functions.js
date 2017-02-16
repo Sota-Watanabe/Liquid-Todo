@@ -9195,4 +9195,4 @@ module.exports.transfer = function(){
     liquid.vdom.virtualize();
     liquid.vdom.transfer();
 };
-},{"@zharktas/liquid.js":2}]},{},["functions"]);
+},{"@zharktas/liquid.js":2}]},{},[]);
